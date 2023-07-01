@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <rect x="100" y="100" width="300" height="300" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); stroke-width: 21px; stroke-linejoin: bevel;"/>
+  <rect x="200" y="200" width="100" height="100" style="stroke: rgb(0, 0, 0);"/>
+  <path style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" d="M 200 200 C 201.972 199.408 340.648 225.451 284.016 242.441 L 300 300 C 266.569 345.662 167.399 310.76 220.492 246.949"/>
+  <ellipse style="stroke: rgb(0, 0, 0); paint-order: fill; fill-rule: nonzero;" cx="267.828" cy="234.085" rx="8.811" ry="9.631"/>
+</svg>

@@ -1,0 +1,7 @@
+/x64
+/Debug
+/.vs
+/ClipShare/Debug
+/ClipShare/x64
+/ClipShare/*.user
+/ClipShare/*.aps

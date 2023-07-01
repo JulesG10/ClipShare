@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="share">
+      <UniqueIdentifier>{bbea3e5b-31c4-4135-8b3d-a3988517bad4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="path">
+      <UniqueIdentifier>{38095be1-73f4-4b3b-9f4a-e476638db5c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="qrcode">
+      <UniqueIdentifier>{bd8b60f3-2cdf-44c9-b4a1-dd451c5e3b4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="parser">
+      <UniqueIdentifier>{b1e5851c-ecc9-42e1-a35c-e5618e92d5e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="clipboard">
+      <UniqueIdentifier>{35fbf32b-1041-4b01-9a67-9bf6dbf3a925}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="app">
+      <UniqueIdentifier>{fc2cf83e-7647-4514-8c17-e7888326ed69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{b7f15840-7def-4658-9b05-45129cf6d1d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="share.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="share_data.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="path.cpp">
+      <Filter>path</Filter>
+    </ClCompile>
+    <ClCompile Include="qrcode.cpp">
+      <Filter>qrcode</Filter>
+    </ClCompile>
+    <ClCompile Include="clipboard.cpp">
+      <Filter>clipboard</Filter>
+    </ClCompile>
+    <ClCompile Include="didec.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="app.cpp">
+      <Filter>app</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="share.h">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="share_data.h">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="path.h">
+      <Filter>path</Filter>
+    </ClInclude>
+    <ClInclude Include="qrcode.h">
+      <Filter>qrcode</Filter>
+    </ClInclude>
+    <ClInclude Include="clipboard.h">
+      <Filter>clipboard</Filter>
+    </ClInclude>
+    <ClInclude Include="didec.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="app.h">
+      <Filter>app</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="ClipShare.ico">
+      <Filter>resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClipShare.svg">
+      <Filter>resources</Filter>
+    </None>
+  </ItemGroup>
+</Project>
