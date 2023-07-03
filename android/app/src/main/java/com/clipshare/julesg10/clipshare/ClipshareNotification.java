@@ -74,17 +74,16 @@ public class ClipshareNotification {
         Intent stopIntent = new Intent(this.context, ClipshareService.class);
         stopIntent.setAction(ClipshareService.STOP_ACTION);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.context, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getService(this.context, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE);
 
         this.builder = new NotificationCompat.Builder(this.context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.clipshare)
                 .setContentTitle("ClipShare Service")
                 .setContentText("")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .addAction(R.drawable.stop, "Stop", pendingIntent)
+                .addAction(R.drawable.ic_close, "Stop", pendingIntent)
                 .setChannelId(CHANNEL_ID)
                 .setOngoing(true);
-
         this.update();
     }
 

@@ -1,6 +1,7 @@
 package com.clipshare.julesg10;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -26,13 +27,13 @@ public class MainActivity extends AppCompatActivity implements ClipshareCallback
     private static final int REQUEST_CODE = 100;
     private ProgressDialog progressDialog;
 
+    private boolean isServiceAlive = false;
     ClipshareService serviceInstance;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = new Intent(this, ClipshareService.class);
-        bindService(intent, this.serviceConnection, Context.BIND_AUTO_CREATE);
+       this.bindService();
 
         setContentView(R.layout.activity_main);
 
@@ -48,10 +49,8 @@ public class MainActivity extends AppCompatActivity implements ClipshareCallback
            }
         }
         mCodeScanner.setDecodeCallback(result -> runOnUiThread(() -> {
-            if(serviceInstance != null)
-            {
-                serviceInstance.onRecieveQRCodeData(result.getText());
-            }
+            this.bindService();
+            serviceInstance.onRecieveQRCodeData(result.getText());
         }));
         scannerView.setOnClickListener(view -> mCodeScanner.startPreview());
     }
@@ -82,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements ClipshareCallback
 
     @Override
     public void onServiceStatusUpdate(ClipshareStatus status) {
+
         runOnUiThread(() -> {
             switch (status)
             {
@@ -98,10 +98,19 @@ public class MainActivity extends AppCompatActivity implements ClipshareCallback
                     if(this.progressDialog != null) this.progressDialog.dismiss();
 
                     mCodeScanner.startPreview();
-                    Toast.makeText(this, "Connection failed", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(this, "Connection failed", Toast.LENGTH_LONG).show();
                     break;
             }
         });
+    }
+
+    private void bindService()
+    {
+        if(!isServiceAlive)
+        {
+            Intent intent = new Intent(this, ClipshareService.class);
+            bindService(intent, this.serviceConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
@@ -110,11 +119,12 @@ public class MainActivity extends AppCompatActivity implements ClipshareCallback
             ClipshareService.ClipShareBinder binder = (ClipshareService.ClipShareBinder)service;
             serviceInstance = binder.getService();
             serviceInstance.setCallback(MainActivity.this);
+            isServiceAlive = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-
+            isServiceAlive = false;
         }
     };
 }

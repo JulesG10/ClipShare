@@ -46,7 +46,7 @@ public class Client {
             this.socket.setSendBufferSize(DEFAULT_BUFFER_SIZE);
 
             if (callbacks != null) callbacks.onClientStart();
-        } catch (IOException | NumberFormatException e) {
+        } catch (IllegalArgumentException | IOException e) {
             if (callbacks != null) callbacks.onClientError(e.getMessage());
         }
 

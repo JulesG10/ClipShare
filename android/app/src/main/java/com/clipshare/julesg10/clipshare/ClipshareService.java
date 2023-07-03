@@ -47,10 +47,6 @@ public class ClipshareService extends Service implements ClientCallbacks {
         this.notif.init();
 
         //this.setupClipboard();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            this.notif.setText("Starting...").setLoading(true).setOngoing(true);
-        }
     }
 
     public void setCallback(ClipshareCallback callback)
@@ -96,6 +92,7 @@ public class ClipshareService extends Service implements ClientCallbacks {
         {
             stopForeground(true);
             stopSelf();
+            this.stopService();
         }
 
         return super.onStartCommand(intent, flags, startId);
@@ -142,6 +139,7 @@ public class ClipshareService extends Service implements ClientCallbacks {
     @Override
     public void onClientClose()
     {
+        this.notif.setOngoing(false);
     }
 
     @Override
@@ -158,8 +156,8 @@ public class ClipshareService extends Service implements ClientCallbacks {
         if(this.callback != null) this.callback.onServiceStatusUpdate(ClipshareStatus.FAILED);
 
         this.notif.setText(message)
-                .setLoading(false)
-                .setOngoing(false);
+                .setText(message)
+                .setLoading(false);
     }
 
     @Override
@@ -170,16 +168,16 @@ public class ClipshareService extends Service implements ClientCallbacks {
                 .setLoading(state);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        this.stopService();
-    }
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return this.binder;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.stopService();
     }
 
     public void stopService()
