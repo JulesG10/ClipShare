@@ -1,38 +1,55 @@
 package com.clipshare.julesg10.client;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketException;
 
 public class Client {
-
-    public final int PORT = 20445;
     public final int DEFAULT_BUFFER_SIZE = 4096;
-    private String host;
     private Socket socket;
-
     private Thread thread;
     private boolean active = false;
+    private boolean loading = false;
+    private ClientCallbacks callbacks;
 
-    public ClientCallbacks callbacks;
-
-    public Client(String host, ClientCallbacks callbacks) {
-        this.host = host;
+    public Client(ClientCallbacks callbacks) {
         this.callbacks = callbacks;
     }
 
-    public boolean connect() {
+    public boolean connect(String url) {
         try {
-            this.socket = new Socket(this.host, PORT);
-            this.socket.setSoTimeout(5000);
+            String[] parts = url.split(":");
+            if(parts.length != 2)
+            {
+                if (callbacks != null) callbacks.onClientError("Invalid address");
+                return false;
+            }
+
+            String host = parts[0];
+            int port = Integer.parseInt(parts[1]);
+
+            if (callbacks != null) callbacks.onLoadingStateUpdate(true);
+
+            this.socket.connect(new InetSocketAddress(host, port), 5000);
+
+            if (callbacks != null) callbacks.onLoadingStateUpdate(false);
+
+            if(!this.socket.isConnected())
+            {
+                if (callbacks != null) callbacks.onClientError("Fail to connect");
+                return false;
+            }
 
             this.socket.setReceiveBufferSize(DEFAULT_BUFFER_SIZE);
             this.socket.setSendBufferSize(DEFAULT_BUFFER_SIZE);
 
             if (callbacks != null) callbacks.onClientStart();
-        } catch (IOException e) {
-            if (callbacks != null) callbacks.onClientError(e);
-            return false;
+        } catch (IOException | NumberFormatException e) {
+            if (callbacks != null) callbacks.onClientError(e.getMessage());
         }
+
 
         return true;
     }
@@ -50,16 +67,26 @@ public class Client {
             this.socket.getOutputStream().write(builder.toString().getBytes());
         }catch (Exception e)
         {
-            if(callbacks != null) callbacks.onClientError(e);
+            if(callbacks != null) callbacks.onClientError(e.getMessage());
             this.stop();
         }
     }
 
+    public void restart(String url)
+    {
+        if(this.isActive())
+        {
+            this.stop();
+        }
 
-    public void start()
+        this.start(url);
+    }
+
+    public void start(String url)
     {
         this.thread = new Thread(()->{
-            this.active = this.connect();
+            this.socket = new Socket();
+            this.active = this.connect(url);
 
             StringBuilder recieve = new StringBuilder();
             while(this.active)
@@ -78,14 +105,14 @@ public class Client {
                         }
                     }
                 } catch (IOException e) {
-                    if (callbacks != null) callbacks.onClientError(e);
+                    if (callbacks != null) callbacks.onClientError(e.getMessage());
                     break;
                 }
             }
             if (callbacks != null) callbacks.onClientClose();
             this.active = false;
         });
-        this.thread.run();
+        this.thread.start();
     }
 
     public boolean isActive()
@@ -93,16 +120,17 @@ public class Client {
         return this.active;
     }
 
-    public boolean stop()
+    public boolean isLoading()
     {
+        return this.loading;
+    }
+
+    public void stop() {
         this.active = false;
         try {
-            this.thread.interrupt();
-        }catch (Exception e)
-        {
-            return false;
-        }
-
-        return true;
+            if (this.thread != null) {
+                this.thread.interrupt();
+            }
+        } catch (Exception ignore) {}
     }
 }

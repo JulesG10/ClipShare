@@ -1,25 +1,16 @@
-package com.clipshare.julesg10;
+package com.clipshare.julesg10.clipshare;
 
 
-import android.Manifest;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import com.clipshare.julesg10.client.Client;
 import com.clipshare.julesg10.client.ClientCallbacks;
@@ -29,22 +20,30 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClipboardService extends Service implements ClientCallbacks {
+public class ClipshareService extends Service implements ClientCallbacks {
 
     public static final String STOP_ACTION = "STOP_SERVICE";
 
-    private NotificationSystem notif;
+    private ClipshareNotification notif;
     private Client client;
     private int id = 0;
     private ClipboardManager clipboardManager;
     private ClipboardManager.OnPrimaryClipChangedListener clipChangedListener;
+    private ClipshareCallback callback;
 
+    private final IBinder binder = new ClipShareBinder();
+
+    public class ClipShareBinder extends Binder {
+        public ClipshareService getService() {
+            return ClipshareService.this;
+        }
+    }
     @Override
     public void onCreate() {
         super.onCreate();
 
         this.client = new Client(this);
-        this.notif = new NotificationSystem(this);
+        this.notif = new ClipshareNotification(this);
         this.notif.init();
 
         //this.setupClipboard();
@@ -52,6 +51,11 @@ public class ClipboardService extends Service implements ClientCallbacks {
         {
             this.notif.setText("Starting...").setLoading(true).setOngoing(true);
         }
+    }
+
+    public void setCallback(ClipshareCallback callback)
+    {
+        this.callback = callback;
     }
 
     public void setupClipboard() {
@@ -81,7 +85,6 @@ public class ClipboardService extends Service implements ClientCallbacks {
         clipboardManager.addPrimaryClipChangedListener(clipChangedListener);
     }
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent == null)
@@ -92,15 +95,16 @@ public class ClipboardService extends Service implements ClientCallbacks {
         if(intent.getAction() != null && intent.getAction().equals(STOP_ACTION))
         {
             stopForeground(true);
-            //stopSelf();
+            stopSelf();
         }
-        else if(intent.hasExtra("url"))
-        {
-            this.notif.setOngoing(true);
-            String url = intent.getStringExtra("url");
-            this.client.restart(url);
-        }
+
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    public void onRecieveQRCodeData(String url)
+    {
+        this.notif.setOngoing(true);
+        this.client.restart(url);
     }
 
     @Override
@@ -142,6 +146,8 @@ public class ClipboardService extends Service implements ClientCallbacks {
 
     @Override
     public void onClientStart() {
+        if(this.callback != null) this.callback.onServiceStatusUpdate(ClipshareStatus.SUCCESS);
+
         this.notif.setText("Client ready")
                 .setLoading(false)
                 .setOngoing(true);
@@ -149,6 +155,8 @@ public class ClipboardService extends Service implements ClientCallbacks {
 
     @Override
     public void onClientError(String message) {
+        if(this.callback != null) this.callback.onServiceStatusUpdate(ClipshareStatus.FAILED);
+
         this.notif.setText(message)
                 .setLoading(false)
                 .setOngoing(false);
@@ -156,6 +164,8 @@ public class ClipboardService extends Service implements ClientCallbacks {
 
     @Override
     public void onLoadingStateUpdate(boolean state) {
+        if(this.callback != null) this.callback.onServiceStatusUpdate(ClipshareStatus.LOADING);
+
         this.notif.setText("Connecting...")
                 .setLoading(state);
     }
@@ -169,7 +179,7 @@ public class ClipboardService extends Service implements ClientCallbacks {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return this.binder;
     }
 
     public void stopService()
